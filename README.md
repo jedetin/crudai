@@ -60,7 +60,7 @@ No Composer. No external dependencies.
 **1. Clone the repository**
 
 ```bash
-git clone https://github.com/yourusername/CRUDAI-api.git
+git clone https://github.com/jedetin/CRUDAI-api.git
 cd CRUDAI-api
 ```
 
