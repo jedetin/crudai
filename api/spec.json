@@ -1,15 +1,15 @@
 {
-    "generated_at": "2026-05-06 13:29:00",
-    "database": "hirex_v2",
-    "base_url": "/{table}",
+    "generated_at": "2026-08-12 09:33:12",
+    "database": "crudai_test",
+    "mode": "models",
     "tables": {
-        "candidates": {
+        "company": {
             "primary_key": "id",
             "routes": [
                 {
                     "method": "GET",
-                    "path": "/candidates",
-                    "description": "List records. Supports pagination and column filters.",
+                    "path": "/company",
+                    "description": "List (paginated, filterable)",
                     "query": {
                         "page": {
                             "type": "int",
@@ -19,375 +19,68 @@
                         "per_page": {
                             "type": "int",
                             "default": 20,
-                            "description": "Records per page (max 100)"
+                            "description": "Per page (max 100)"
                         },
-                        "email": {
-                            "type": "varchar",
-                            "description": "Filter by exact email",
+                        "id": {
+                            "type": "int",
+                            "description": "Filter by id",
                             "filterable": true
-                        }
-                    },
-                    "response": "data[] + meta{page, per_page, total}"
-                },
-                {
-                    "method": "GET",
-                    "path": "/candidates/{id}",
-                    "description": "Single record by primary key.",
-                    "response": "object | 404"
-                },
-                {
-                    "method": "POST",
-                    "path": "/candidates",
-                    "description": "Create a new record.",
-                    "body": {
-                        "email": {
-                            "type": "varchar",
-                            "required": false
-                        }
-                    },
-                    "response": "object (201) | errors (422)"
-                },
-                {
-                    "method": "PUT",
-                    "path": "/candidates/{id}",
-                    "description": "Full update. All updatable fields required.",
-                    "body": {
-                        "email": {
-                            "type": "varchar",
-                            "required": false
-                        }
-                    },
-                    "response": "object | 404 | errors (422)"
-                },
-                {
-                    "method": "DELETE",
-                    "path": "/candidates/{id}",
-                    "description": "Delete by primary key.",
-                    "response": "204 | 404"
-                }
-            ],
-            "fields": {
-                "candidate_id": {
-                    "type": "bigint",
-                    "nullable": false,
-                    "auto": true,
-                    "insertable": false,
-                    "updatable": false
-                },
-                "email": {
-                    "type": "varchar",
-                    "nullable": true,
-                    "auto": false,
-                    "insertable": true,
-                    "updatable": true
-                }
-            },
-            "query_params": {
-                "page": {
-                    "type": "int",
-                    "default": 1,
-                    "description": "Page number"
-                },
-                "per_page": {
-                    "type": "int",
-                    "default": 20,
-                    "description": "Records per page (max 100)"
-                },
-                "email": {
-                    "type": "varchar",
-                    "description": "Filter by exact email",
-                    "filterable": true
-                }
-            }
-        },
-        "evaluations": {
-            "primary_key": "id",
-            "routes": [
-                {
-                    "method": "GET",
-                    "path": "/evaluations",
-                    "description": "List records. Supports pagination and column filters.",
-                    "query": {
-                        "page": {
-                            "type": "int",
-                            "default": 1,
-                            "description": "Page number"
-                        },
-                        "per_page": {
-                            "type": "int",
-                            "default": 20,
-                            "description": "Records per page (max 100)"
-                        },
-                        "job_id": {
-                            "type": "bigint",
-                            "description": "Filter by exact job_id",
-                            "filterable": true
-                        },
-                        "candidate_name": {
-                            "type": "varchar",
-                            "description": "Filter by exact candidate_name",
-                            "filterable": true
-                        }
-                    },
-                    "response": "data[] + meta{page, per_page, total}"
-                },
-                {
-                    "method": "GET",
-                    "path": "/evaluations/{id}",
-                    "description": "Single record by primary key.",
-                    "response": "object | 404"
-                },
-                {
-                    "method": "POST",
-                    "path": "/evaluations",
-                    "description": "Create a new record.",
-                    "body": {
-                        "job_id": {
-                            "type": "bigint",
-                            "required": true
-                        },
-                        "candidate_name": {
-                            "type": "varchar",
-                            "required": false
-                        }
-                    },
-                    "response": "object (201) | errors (422)"
-                },
-                {
-                    "method": "PUT",
-                    "path": "/evaluations/{id}",
-                    "description": "Full update. All updatable fields required.",
-                    "body": {
-                        "job_id": {
-                            "type": "bigint",
-                            "required": true
-                        },
-                        "candidate_name": {
-                            "type": "varchar",
-                            "required": false
-                        }
-                    },
-                    "response": "object | 404 | errors (422)"
-                },
-                {
-                    "method": "DELETE",
-                    "path": "/evaluations/{id}",
-                    "description": "Delete by primary key.",
-                    "response": "204 | 404"
-                }
-            ],
-            "fields": {
-                "evaluation_id": {
-                    "type": "bigint",
-                    "nullable": false,
-                    "auto": true,
-                    "insertable": false,
-                    "updatable": false
-                },
-                "job_id": {
-                    "type": "bigint",
-                    "nullable": false,
-                    "auto": false,
-                    "insertable": true,
-                    "updatable": true
-                },
-                "candidate_name": {
-                    "type": "varchar",
-                    "nullable": true,
-                    "auto": false,
-                    "insertable": true,
-                    "updatable": true
-                }
-            },
-            "query_params": {
-                "page": {
-                    "type": "int",
-                    "default": 1,
-                    "description": "Page number"
-                },
-                "per_page": {
-                    "type": "int",
-                    "default": 20,
-                    "description": "Records per page (max 100)"
-                },
-                "job_id": {
-                    "type": "bigint",
-                    "description": "Filter by exact job_id",
-                    "filterable": true
-                },
-                "candidate_name": {
-                    "type": "varchar",
-                    "description": "Filter by exact candidate_name",
-                    "filterable": true
-                }
-            }
-        },
-        "jobs": {
-            "primary_key": "id",
-            "routes": [
-                {
-                    "method": "GET",
-                    "path": "/jobs",
-                    "description": "List records. Supports pagination and column filters.",
-                    "query": {
-                        "page": {
-                            "type": "int",
-                            "default": 1,
-                            "description": "Page number"
-                        },
-                        "per_page": {
-                            "type": "int",
-                            "default": 20,
-                            "description": "Records per page (max 100)"
-                        },
-                        "title": {
-                            "type": "varchar",
-                            "description": "Filter by exact title",
-                            "filterable": true
-                        }
-                    },
-                    "response": "data[] + meta{page, per_page, total}"
-                },
-                {
-                    "method": "GET",
-                    "path": "/jobs/{id}",
-                    "description": "Single record by primary key.",
-                    "response": "object | 404"
-                },
-                {
-                    "method": "POST",
-                    "path": "/jobs",
-                    "description": "Create a new record.",
-                    "body": {
-                        "title": {
-                            "type": "varchar",
-                            "required": false
-                        }
-                    },
-                    "response": "object (201) | errors (422)"
-                },
-                {
-                    "method": "PUT",
-                    "path": "/jobs/{id}",
-                    "description": "Full update. All updatable fields required.",
-                    "body": {
-                        "title": {
-                            "type": "varchar",
-                            "required": false
-                        }
-                    },
-                    "response": "object | 404 | errors (422)"
-                },
-                {
-                    "method": "DELETE",
-                    "path": "/jobs/{id}",
-                    "description": "Delete by primary key.",
-                    "response": "204 | 404"
-                }
-            ],
-            "fields": {
-                "job_id": {
-                    "type": "bigint",
-                    "nullable": false,
-                    "auto": true,
-                    "insertable": false,
-                    "updatable": false
-                },
-                "title": {
-                    "type": "varchar",
-                    "nullable": true,
-                    "auto": false,
-                    "insertable": true,
-                    "updatable": true
-                }
-            },
-            "query_params": {
-                "page": {
-                    "type": "int",
-                    "default": 1,
-                    "description": "Page number"
-                },
-                "per_page": {
-                    "type": "int",
-                    "default": 20,
-                    "description": "Records per page (max 100)"
-                },
-                "title": {
-                    "type": "varchar",
-                    "description": "Filter by exact title",
-                    "filterable": true
-                }
-            }
-        },
-        "personas": {
-            "primary_key": "id",
-            "routes": [
-                {
-                    "method": "GET",
-                    "path": "/personas",
-                    "description": "List records. Supports pagination and column filters.",
-                    "query": {
-                        "page": {
-                            "type": "int",
-                            "default": 1,
-                            "description": "Page number"
-                        },
-                        "per_page": {
-                            "type": "int",
-                            "default": 20,
-                            "description": "Records per page (max 100)"
                         },
                         "name": {
                             "type": "varchar",
-                            "description": "Filter by exact name",
+                            "description": "Filter by name",
                             "filterable": true
                         }
                     },
-                    "response": "data[] + meta{page, per_page, total}"
+                    "response": "data[] + meta{page,per_page,total}"
                 },
                 {
                     "method": "GET",
-                    "path": "/personas/{id}",
-                    "description": "Single record by primary key.",
-                    "response": "object | 404"
+                    "path": "/company/{id}",
+                    "description": "Single record",
+                    "response": "object|404"
                 },
                 {
                     "method": "POST",
-                    "path": "/personas",
-                    "description": "Create a new record.",
+                    "path": "/company",
+                    "description": "Create",
+                    "body": {
+                        "id": {
+                            "type": "int",
+                            "required": false
+                        },
+                        "name": {
+                            "type": "varchar",
+                            "required": false
+                        }
+                    },
+                    "response": "object(201)|errors(422)"
+                },
+                {
+                    "method": "PUT",
+                    "path": "/company/{id}",
+                    "description": "Full update",
                     "body": {
                         "name": {
                             "type": "varchar",
                             "required": false
                         }
                     },
-                    "response": "object (201) | errors (422)"
-                },
-                {
-                    "method": "PUT",
-                    "path": "/personas/{id}",
-                    "description": "Full update. All updatable fields required.",
-                    "body": {
-                        "name": {
-                            "type": "varchar",
-                            "required": false
-                        }
-                    },
-                    "response": "object | 404 | errors (422)"
+                    "response": "object|404|errors(422)"
                 },
                 {
                     "method": "DELETE",
-                    "path": "/personas/{id}",
-                    "description": "Delete by primary key.",
-                    "response": "204 | 404"
+                    "path": "/company/{id}",
+                    "description": "Delete",
+                    "response": "204|404"
                 }
             ],
             "fields": {
-                "persona_id": {
+                "id": {
                     "type": "int",
-                    "nullable": false,
-                    "auto": true,
-                    "insertable": false,
+                    "nullable": true,
+                    "auto": false,
+                    "insertable": true,
                     "updatable": false
                 },
                 "name": {
@@ -407,11 +100,288 @@
                 "per_page": {
                     "type": "int",
                     "default": 20,
-                    "description": "Records per page (max 100)"
+                    "description": "Per page (max 100)"
+                },
+                "id": {
+                    "type": "int",
+                    "description": "Filter by id",
+                    "filterable": true
                 },
                 "name": {
                     "type": "varchar",
-                    "description": "Filter by exact name",
+                    "description": "Filter by name",
+                    "filterable": true
+                }
+            }
+        },
+        "employee": {
+            "primary_key": "id",
+            "routes": [
+                {
+                    "method": "GET",
+                    "path": "/employee",
+                    "description": "List (paginated, filterable)",
+                    "query": {
+                        "page": {
+                            "type": "int",
+                            "default": 1,
+                            "description": "Page number"
+                        },
+                        "per_page": {
+                            "type": "int",
+                            "default": 20,
+                            "description": "Per page (max 100)"
+                        },
+                        "id": {
+                            "type": "int",
+                            "description": "Filter by id",
+                            "filterable": true
+                        },
+                        "company_id": {
+                            "type": "int",
+                            "description": "Filter by company_id",
+                            "filterable": true
+                        },
+                        "name": {
+                            "type": "varchar",
+                            "description": "Filter by name",
+                            "filterable": true
+                        }
+                    },
+                    "response": "data[] + meta{page,per_page,total}"
+                },
+                {
+                    "method": "GET",
+                    "path": "/employee/{id}",
+                    "description": "Single record",
+                    "response": "object|404"
+                },
+                {
+                    "method": "POST",
+                    "path": "/employee",
+                    "description": "Create",
+                    "body": {
+                        "id": {
+                            "type": "int",
+                            "required": false
+                        },
+                        "company_id": {
+                            "type": "int",
+                            "required": true
+                        },
+                        "name": {
+                            "type": "varchar",
+                            "required": false
+                        }
+                    },
+                    "response": "object(201)|errors(422)"
+                },
+                {
+                    "method": "PUT",
+                    "path": "/employee/{id}",
+                    "description": "Full update",
+                    "body": {
+                        "company_id": {
+                            "type": "int",
+                            "required": true
+                        },
+                        "name": {
+                            "type": "varchar",
+                            "required": false
+                        }
+                    },
+                    "response": "object|404|errors(422)"
+                },
+                {
+                    "method": "DELETE",
+                    "path": "/employee/{id}",
+                    "description": "Delete",
+                    "response": "204|404"
+                }
+            ],
+            "fields": {
+                "id": {
+                    "type": "int",
+                    "nullable": true,
+                    "auto": false,
+                    "insertable": true,
+                    "updatable": false
+                },
+                "company_id": {
+                    "type": "int",
+                    "nullable": false,
+                    "auto": false,
+                    "insertable": true,
+                    "updatable": true
+                },
+                "name": {
+                    "type": "varchar",
+                    "nullable": true,
+                    "auto": false,
+                    "insertable": true,
+                    "updatable": true
+                }
+            },
+            "query_params": {
+                "page": {
+                    "type": "int",
+                    "default": 1,
+                    "description": "Page number"
+                },
+                "per_page": {
+                    "type": "int",
+                    "default": 20,
+                    "description": "Per page (max 100)"
+                },
+                "id": {
+                    "type": "int",
+                    "description": "Filter by id",
+                    "filterable": true
+                },
+                "company_id": {
+                    "type": "int",
+                    "description": "Filter by company_id",
+                    "filterable": true
+                },
+                "name": {
+                    "type": "varchar",
+                    "description": "Filter by name",
+                    "filterable": true
+                }
+            }
+        },
+        "employee_profile": {
+            "primary_key": "id",
+            "routes": [
+                {
+                    "method": "GET",
+                    "path": "/employee_profile",
+                    "description": "List (paginated, filterable)",
+                    "query": {
+                        "page": {
+                            "type": "int",
+                            "default": 1,
+                            "description": "Page number"
+                        },
+                        "per_page": {
+                            "type": "int",
+                            "default": 20,
+                            "description": "Per page (max 100)"
+                        },
+                        "id": {
+                            "type": "int",
+                            "description": "Filter by id",
+                            "filterable": true
+                        },
+                        "employee_id": {
+                            "type": "int",
+                            "description": "Filter by employee_id",
+                            "filterable": true
+                        },
+                        "phone": {
+                            "type": "varchar",
+                            "description": "Filter by phone",
+                            "filterable": true
+                        }
+                    },
+                    "response": "data[] + meta{page,per_page,total}"
+                },
+                {
+                    "method": "GET",
+                    "path": "/employee_profile/{id}",
+                    "description": "Single record",
+                    "response": "object|404"
+                },
+                {
+                    "method": "POST",
+                    "path": "/employee_profile",
+                    "description": "Create",
+                    "body": {
+                        "id": {
+                            "type": "int",
+                            "required": false
+                        },
+                        "employee_id": {
+                            "type": "int",
+                            "required": true
+                        },
+                        "phone": {
+                            "type": "varchar",
+                            "required": false
+                        }
+                    },
+                    "response": "object(201)|errors(422)"
+                },
+                {
+                    "method": "PUT",
+                    "path": "/employee_profile/{id}",
+                    "description": "Full update",
+                    "body": {
+                        "employee_id": {
+                            "type": "int",
+                            "required": true
+                        },
+                        "phone": {
+                            "type": "varchar",
+                            "required": false
+                        }
+                    },
+                    "response": "object|404|errors(422)"
+                },
+                {
+                    "method": "DELETE",
+                    "path": "/employee_profile/{id}",
+                    "description": "Delete",
+                    "response": "204|404"
+                }
+            ],
+            "fields": {
+                "id": {
+                    "type": "int",
+                    "nullable": true,
+                    "auto": false,
+                    "insertable": true,
+                    "updatable": false
+                },
+                "employee_id": {
+                    "type": "int",
+                    "nullable": false,
+                    "auto": false,
+                    "insertable": true,
+                    "updatable": true
+                },
+                "phone": {
+                    "type": "varchar",
+                    "nullable": true,
+                    "auto": false,
+                    "insertable": true,
+                    "updatable": true
+                }
+            },
+            "query_params": {
+                "page": {
+                    "type": "int",
+                    "default": 1,
+                    "description": "Page number"
+                },
+                "per_page": {
+                    "type": "int",
+                    "default": 20,
+                    "description": "Per page (max 100)"
+                },
+                "id": {
+                    "type": "int",
+                    "description": "Filter by id",
+                    "filterable": true
+                },
+                "employee_id": {
+                    "type": "int",
+                    "description": "Filter by employee_id",
+                    "filterable": true
+                },
+                "phone": {
+                    "type": "varchar",
+                    "description": "Filter by phone",
                     "filterable": true
                 }
             }

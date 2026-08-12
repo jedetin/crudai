@@ -7,68 +7,78 @@ require_once __DIR__ . '/generator/SchemaParser.php';
 require_once __DIR__ . '/generator/CrudGenerator.php';
 
 // ---------------------------------------------------------------------------
-// Config — edit this section before running
+// Config
 // ---------------------------------------------------------------------------
 
 $config = [
     'host' => 'localhost',
-    'name' => 'hotel',          // database name
+    'name' => 'crudai_test',
     'user' => 'root',
     'pass' => '',
 ];
 
 /**
- * Source mode — choose ONE:
- *
- *   'ddl'  — parse a local SQL file (no DB connection needed)
- *   'pdo'  — introspect the live database
+ * Output mode:
+ *   'api'    — generates api/ folder (HTTP handlers + router)
+ *   'models' — generates models/ folder (static PHP classes, no HTTP)
+ *   'both'   — generates both
  */
-$mode   = 'ddl';
-$ddlFile = __DIR__ . '/schema.sql';   // only used when $mode === 'ddl'
+$mode = 'models';
 
-$outputDir = __DIR__ . '/api';
+/**
+ * Schema source:
+ *   'ddl' — parse a local .sql file (no DB connection needed)
+ *   'pdo' — introspect a live database
+ */
+$source  = 'ddl';
+$ddlFile = __DIR__ . '/schema.sql';
+
+$outputDir = __DIR__ . '/api';   // used as-is for 'api' and 'models'; for 'both', models/ is auto-placed beside api/
 
 // ---------------------------------------------------------------------------
-// Parse schema
+// Parse
 // ---------------------------------------------------------------------------
 
-echo "CRUDify API Generator\n";
-echo str_repeat('-', 40) . "\n";
-echo "Mode      : {$mode}\n";
-echo "Database  : {$config['name']}\n";
-echo "Output    : {$outputDir}\n\n";
+echo "CRUDify Generator<br />" . str_repeat('-', 40) . "<br />";
+echo "Mode   : {$mode}<br />";
+echo "Source : {$source}<br />";
+echo "DB     : {$config['name']}<br /><br />";
 
-if ($mode === 'ddl') {
+if ($source === 'ddl') {
     if (!file_exists($ddlFile)) {
-        fwrite(STDERR, "Error: DDL file not found: {$ddlFile}\n");
+        fwrite(STDERR, "DDL file not found: {$ddlFile}<br />");
         exit(1);
     }
-    $ddl    = file_get_contents($ddlFile);
-    $tables = SchemaParser::fromDdl($ddl);
-
-} elseif ($mode === 'pdo') {
+    $tables = SchemaParser::fromDdl(file_get_contents($ddlFile));
+} elseif ($source === 'pdo') {
     try {
-        $dsn = "mysql:host={$config['host']};dbname={$config['name']};charset=utf8mb4";
-        $pdo = new PDO($dsn, $config['user'], $config['pass'], [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        ]);
+        $pdo    = new PDO(
+            "mysql:host={$config['host']};dbname={$config['name']};charset=utf8mb4",
+            $config['user'],
+            $config['pass'],
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+        );
         $tables = SchemaParser::fromPdo($pdo, $config['name']);
     } catch (PDOException $e) {
-        fwrite(STDERR, "DB connection failed: {$e->getMessage()}\n");
+        fwrite(STDERR, "DB error: {$e->getMessage()}<br />");
         exit(1);
     }
-
 } else {
-    fwrite(STDERR, "Unknown mode: {$mode}. Use 'ddl' or 'pdo'.\n");
+    print('STDERR'. "Unknown source: {$source}<br />");
     exit(1);
 }
 
-echo "Tables found: " . implode(', ', array_keys($tables)) . "\n\n";
-echo "Generating files...\n";
+if (empty($tables)) {
+    print('STDERR'. "No tables found. Check your schema source.<br />");
+    exit(1);
+}
+
+echo "Tables : " . implode(', ', array_keys($tables)) . "<br /><br />";
+echo "Generating...<br />";
 
 // ---------------------------------------------------------------------------
 // Generate
 // ---------------------------------------------------------------------------
 
-$gen = new CrudGenerator($tables, $config, $outputDir);
+$gen = new CrudGenerator($tables, $config, $outputDir, $mode);
 $gen->run();
