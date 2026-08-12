@@ -35,47 +35,46 @@ class SchemaParser
     {
         $tables = [];
 
-        // 1. Strip block comments /* ... */
+        // Strip comments
         $ddl = preg_replace('/\/\*.*?\*\//s', '', $ddl);
-
-        // 2. Strip line comments -- ...
-        //    Must happen after block comment strip so we don't mangle block comment content
         $ddl = preg_replace('/--[^\n]*/u', '', $ddl);
-
-        // 3. Normalise whitespace runs to single spaces, but keep newlines
-        //    (newlines help the block splitter below)
+        // Collapse spaces/tabs (keep newlines — not needed now but harmless)
         $ddl = preg_replace('/[ \t]+/', ' ', $ddl);
 
-        // 4. Extract CREATE TABLE blocks.
-        //
-        //    Pattern breakdown:
-        //      CREATE\s+TABLE\s+           — literal keywords with flexible spacing
-        //      (?:IF\s+NOT\s+EXISTS\s+)?   — optional IF NOT EXISTS
-        //      [`"]?(\w+)[`"]?             — table name, optionally backtick/quote-quoted
-        //      \s*\(                       — opening paren
-        //      (.+?)                       — body (non-greedy, DOTALL)
-        //      \)\s*                       — closing paren
-        //      [^;]*;                      — everything up to the semicolon (ENGINE=... etc.)
-        //
-        //    The [^;]*; end anchor is the key fix — it consumes the full trailer
-        //    (ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=...) without
-        //    requiring us to enumerate every possible keyword.
-
+        // Find each CREATE TABLE header, then walk parens to extract body.
+        // Cannot use a regex for the body — it stops at the first ')' inside
+        // VARCHAR(n), ENUM(...) etc. Instead: regex finds the opening '(',
+        // then a character walk tracks depth to find the matching closing ')'.
         preg_match_all(
-            '/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?[`"]?(\w+)[`"]?\s*\((.+?)\)\s*[^;]*;/si',
+            '/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?[`"]?(\w+)[`"]?\s*\(/i',
             $ddl,
-            $matches,
-            PREG_SET_ORDER
+            $headers,
+            PREG_OFFSET_CAPTURE
         );
 
-        foreach ($matches as $m) {
-            $tableName = strtolower($m[1]);
-            $body      = $m[2];
-            $tables[$tableName] = self::parseTableBody($tableName, $body);
+        foreach ($headers[0] as $i => $match) {
+            $tableName = strtolower($headers[1][$i][0]);
+            $start     = $match[1] + strlen($match[0]) - 1; // position of opening '('
+
+            // Walk from '(' tracking depth until we find the matching ')'
+            $depth = 0;
+            $body  = '';
+            for ($j = $start, $len = strlen($ddl); $j < $len; $j++) {
+                $ch = $ddl[$j];
+                if ($ch === '(') $depth++;
+                if ($ch === ')') $depth--;
+                if ($depth === 0) {
+                    $body = substr($ddl, $start + 1, $j - $start - 1);
+                    break;
+                }
+            }
+
+            if ($body !== '') {
+                $tables[$tableName] = self::parseTableBody($tableName, $body);
+            }
         }
 
         self::linkForeignKeys($tables);
-
         return $tables;
     }
 
